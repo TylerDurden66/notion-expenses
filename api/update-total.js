@@ -6,23 +6,31 @@ const notion = new Client({
 
 export default async function handler(req, res) {
   try {
-    const expenses = await notion.databases.query({
-      database_id: process.env.EXPENSES_DATABASE_ID,
-      filter: {
-        property: "Amount",
-        number: {
-          is_not_empty: true
-        }
-      }
-    });
+    let allExpenses = [];
+    let hasMore = true;
+    let startCursor = undefined;
 
-    // Log each expense amount for debugging
-    console.log('Found expenses:', expenses.results.map(expense => ({
-      amount: expense.properties.Amount.number,
-      // Add any other relevant properties you want to check
-    })));
+    while (hasMore) {
+      const response = await notion.databases.query({
+        database_id: process.env.EXPENSES_DATABASE_ID,
+        filter: {
+          property: "Amount",
+          number: {
+            is_not_empty: true
+          }
+        },
+        start_cursor: startCursor,
+        page_size: 100
+      });
 
-    const total = expenses.results.reduce((sum, expense) => {
+      allExpenses = [...allExpenses, ...response.results];
+      hasMore = response.has_more;
+      startCursor = response.next_cursor;
+    }
+
+    console.log(`Found total of ${allExpenses.length} expenses`);
+
+    const total = allExpenses.reduce((sum, expense) => {
       return sum + (expense.properties.Amount.number || 0);
     }, 0);
 
