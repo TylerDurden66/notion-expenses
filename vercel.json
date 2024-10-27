@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "crons": {
-    "update-total": {
+  "crons": [
+    {
       "path": "/api/update-total",
       "schedule": "*/5 * * * *"
     }
-  }
+  ]
 }
