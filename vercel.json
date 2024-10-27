@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/update-total",
-      "schedule": "30 16 * * *"
+      "schedule": "10 14 * * *"
     }
   ]
 }
