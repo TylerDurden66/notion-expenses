@@ -20,14 +20,22 @@ export default async function handler(req, res) {
       return sum + (expense.properties.Amount.number || 0);
     }, 0);
 
-    await notion.pages.update({
-      page_id: process.env.DESTINATION_PAGE_ID,
-      properties: {
-        "Total": {
-          number: total
-        }
+// Update destination database
+await notion.pages.create({
+  parent: {
+    database_id: process.env.DESTINATION_DATABASE_ID
+  },
+  properties: {
+    "Total": {  // Make sure this matches your column name exactly
+      number: total
+    },
+    "Date": {   // If you want to track when the total was updated
+      date: {
+        start: new Date().toISOString()
       }
-    });
+    }
+  }
+});
 
     res.status(200).json({ success: true, total });
   } catch (error) {
