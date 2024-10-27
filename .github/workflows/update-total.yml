@@ -1,0 +1,15 @@
+name: Update Notion Total    # The name of your GitHub Action workflow
+
+on:                         # Defines when this workflow should run
+  schedule:
+    - cron: '*/5 * * * *'  # Schedule using cron syntax: every 5 minutes
+  workflow_dispatch:        # Adds a button in GitHub to run it manually
+
+jobs:                       # List of jobs to run
+  update-total:            # Name of the job
+    runs-on: ubuntu-latest # Uses Ubuntu as the environment
+
+    steps:                 # List of steps to execute
+      - name: Trigger Update Total Endpoint  # Description of this step
+        run: |             # The command to run
+          curl -X GET "https://notion-expenses-dun.vercel.app/api/update-total"
