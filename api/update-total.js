@@ -16,26 +16,33 @@ export default async function handler(req, res) {
       }
     });
 
+    // Log each expense amount for debugging
+    console.log('Found expenses:', expenses.results.map(expense => ({
+      amount: expense.properties.Amount.number,
+      // Add any other relevant properties you want to check
+    })));
+
     const total = expenses.results.reduce((sum, expense) => {
       return sum + (expense.properties.Amount.number || 0);
     }, 0);
 
-// Update destination database
-await notion.pages.create({
-  parent: {
-    database_id: process.env.DESTINATION_DATABASE_ID
-  },
-  properties: {
-    "Total": {  // Make sure this matches your column name exactly
-      number: total
-    },
-    "Date": {   // If you want to track when the total was updated
-      date: {
-        start: new Date().toISOString()
+    console.log('Calculated total:', total);
+
+    await notion.pages.create({
+      parent: {
+        database_id: process.env.DESTINATION_DATABASE_ID
+      },
+      properties: {
+        "Total": {
+          number: total
+        },
+        "Date": {
+          date: {
+            start: new Date().toISOString()
+          }
+        }
       }
-    }
-  }
-});
+    });
 
     res.status(200).json({ success: true, total });
   } catch (error) {
